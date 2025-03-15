@@ -3,14 +3,14 @@ import json
 
 
 class Address(BaseModel):
-    city: str = Field(min_length=2, description="City name must have at least 2 characters")
-    street: str = Field(min_length=3, description="Street name must have at least 3 characters")
-    house_number: int = Field(gt=0, description="House number must be a positive integer")
+    city: str = Field(min_length=2)
+    street: str = Field(min_length=3)
+    house_number: int = Field(gt=0)
 
 
 class User(BaseModel):
-    name: str = Field(..., min_length=2, pattern="^[a-zA-Z]+$", description="Name must contain only letters")
-    age: int = Field(..., ge=0, le=120, description="Age must be between 0 and 120")
+    name: str = Field(..., min_length=2, pattern="^[a-zA-Z]+$")
+    age: int = Field(..., ge=0, le=120)
     email: EmailStr
     is_employed: bool
     address: Address
@@ -19,7 +19,7 @@ class User(BaseModel):
     def validate_employment_age(cls, age, values):
         is_employed = values.data.get("is_employed")
         if is_employed and (age < 18 or age > 65):
-            raise ValueError("If employed, age must be between 18 and 65")
+            raise ValueError("Если занят, возраст от 18 до 65 лет")
         return age
 
 
@@ -31,34 +31,20 @@ def process_user_registration(json_str: str):
         return json.dumps({"error": e.errors()}, indent=4, ensure_ascii=False)
 
 
-# Примеры входных данных:
 
-valid_json = """{
-    "name": "Alice",
-    "age": 30,
-    "email": "alice@example.com",
-    "is_employed": true,
-    "address": {
-        "city": "Moscow",
-        "street": "Tverskaya",
-        "house_number": 10
-    }
-}"""
 
-invalid_json = """{
+json_input = """{
     "name": "John Doe",
     "age": 70,
     "email": "john.doe@example.com",
     "is_employed": true,
     "address": {
-    "city": "New York",
-    "street": "5th Avenue",
-    "house_number": 123
+        "city": "New York",
+        "street": "5th Avenue",
+        "house_number": 123
     }
-
 }"""
 
-print(process_user_registration(valid_json))
-print(process_user_registration(invalid_json))
+print(process_user_registration(json_input))
 
 
